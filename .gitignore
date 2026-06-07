@@ -7,3 +7,5 @@ ios/
 *.apk
 *.aab
 .env
+.claude/
+.vscode/
