@@ -1,0 +1,10 @@
+.git
+.gitignore
+node_modules
+.vscode
+.idea
+*.apk
+*.aab
+*.zip
+*.tar
+*.gz
