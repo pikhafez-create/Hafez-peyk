@@ -7,7 +7,6 @@
     "icon": "./assets/images/icon.png",
     "scheme": "peykhafez",
     "userInterfaceStyle": "automatic",
-    "jsEngine": "jsc",
     "ios": {
       "icon": "./assets/expo.icon"
     },
