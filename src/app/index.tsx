@@ -1,31 +1,19 @@
-import { View, Text, Pressable } from "react-native";
+import React from "react";
+import Page from "../components/layout/Page";
+import FAB from "../components/ui/FAB";
+import EmptyState from "../components/ui/EmptyState";
+import { View } from "react-native";
 import { useRouter } from "expo-router";
-import { getUser } from "../utils/auth";
-import { useEffect } from "react";
 
-export default function Index() {
+export default function Home() {
   const router = useRouter();
 
-  useEffect(() => {
-    const check = async () => {
-      const user = await getUser();
-
-      if (!user) {
-        router.replace("/(auth)/login");
-        return;
-      }
-
-      if (user.role === "admin") router.replace("/admin/orders");
-      if (user.role === "driver") router.replace("/driver");
-      if (user.role === "customer") router.replace("/customer/create-order");
-    };
-
-    check();
-  }, []);
-
   return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Text>در حال بررسی ورود...</Text>
-    </View>
+    <Page title="خانه">
+      <View style={{ flex: 1 }}>
+        <EmptyState title="داشبورد آماده است" />
+        <FAB onPress={() => router.push("/customer/create-order")} />
+      </View>
+    </Page>
   );
 }

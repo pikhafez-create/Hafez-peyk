@@ -1,94 +1,104 @@
-import { useEffect, useState } from "react";
-import { View, Text, ScrollView, Pressable } from "react-native";
-import { getOrders, updateStatus, Order } from "../../utils/storage";
-import { getUser } from "../../utils/auth";
-import { useAutoRefresh } from "../../hooks/useAutoRefresh";
+import React, { useState } from "react";
+import { View, Text, StyleSheet } from "react-native";
 
-export default function DriverPanel() {
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [driverId, setDriverId] = useState<string>("");
+import Screen from "../../components/layout/Screen";
+import Header from "../../components/Header";
+import ProfileCard from "../../components/ProfileCard";
+import SearchBar from "../../components/SearchBar";
+import FilterBar from "../../components/FilterBar";
+import DashboardCard from "../../components/DashboardCard";
+import OrderCard from "../../components/OrderCard";
+import Button from "../../components/Button";
 
-  const loadUser = async () => {
-    const user = await getUser();
-    if (user?.role === "driver") {
-      setDriverId(user.id);
-    }
-  };
-
-  const load = async () => {
-    const data = await getOrders();
-    setOrders(data);
-  };
-
-  useEffect(() => {
-    loadUser();
-    load();
-  }, []);
-
-  useAutoRefresh(() => {
-    load();
-    loadUser();
-  }, 3000);
-
-  const myOrders = orders.filter(o => o.driver === driverId);
-
-  const refresh = async (fn: () => Promise<void>) => {
-    await fn();
-    await load();
-  };
+export default function DriverScreen() {
+  const [search, setSearch] = useState("");
 
   return (
-    <ScrollView style={{ flex: 1, padding: 20 }}>
-      <Text style={{ fontSize: 24, marginBottom: 20 }}>
-        پنل راننده
-      </Text>
+    <>
+      <Header title="پنل راننده" />
 
-      {driverId === "" ? (
-        <Text>کاربر راننده شناسایی نشد</Text>
-      ) : myOrders.length === 0 ? (
-        <Text>سفارشی برای شما وجود ندارد</Text>
-      ) : (
-        myOrders.map(order => (
-          <View
-            key={order.id}
-            style={{
-              borderWidth: 1,
-              padding: 10,
-              marginBottom: 10,
-              borderRadius: 8,
-            }}
-          >
-            <Text>مشتری: {order.customerName}</Text>
-            <Text>مبدا: {order.pickup}</Text>
-            <Text>مقصد: {order.dropoff}</Text>
-            <Text>وضعیت: {order.status}</Text>
+      <Screen>
+        <ProfileCard
+          name="احمد محمدی"
+          role="راننده"
+        />
 
-            {order.status === "assigned" && (
-              <Pressable onPress={() =>
-                refresh(() => updateStatus(order.id, "picked"))
-              }>
-                <Text>برداشتن سفارش</Text>
-              </Pressable>
-            )}
+        <SearchBar
+          value={search}
+          onChangeText={setSearch}
+        />
 
-            {order.status === "picked" && (
-              <Pressable onPress={() =>
-                refresh(() => updateStatus(order.id, "delivering"))
-              }>
-                <Text>شروع ارسال</Text>
-              </Pressable>
-            )}
+        <FilterBar />
 
-            {order.status === "delivering" && (
-              <Pressable onPress={() =>
-                refresh(() => updateStatus(order.id, "done"))
-              }>
-                <Text>تحویل شد</Text>
-              </Pressable>
-            )}
+        <View style={styles.statsRow}>
+          <View style={styles.card}>
+            <DashboardCard
+              value="3"
+              label="سفارش فعال"
+            />
           </View>
-        ))
-      )}
-    </ScrollView>
+
+          <View style={styles.card}>
+            <DashboardCard
+              value="12"
+              label="تحویل امروز"
+            />
+          </View>
+        </View>
+
+        <Text style={styles.title}>
+          مأموریت فعلی
+        </Text>
+
+        <OrderCard
+          id="1254"
+          customer="علی رضایی"
+          pickup="بازار مرکزی"
+          destination="میدان آزادی"
+        />
+
+        <Button
+          title="شروع مأموریت"
+          onPress={() => {}}
+        />
+
+        <Text style={styles.title}>
+          سفارش‌های تخصیص یافته
+        </Text>
+
+        <OrderCard
+          id="1255"
+          customer="محمد کریمی"
+          pickup="ترمینال"
+          destination="خیابان امام"
+        />
+
+        <OrderCard
+          id="1256"
+          customer="رضا احمدی"
+          pickup="میدان شهدا"
+          destination="بلوار آزادی"
+        />
+      </Screen>
+    </>
   );
 }
+
+const styles = StyleSheet.create({
+  statsRow: {
+    flexDirection: "row-reverse",
+    marginBottom: 16,
+  },
+
+  card: {
+    flex: 1,
+    marginHorizontal: 4,
+  },
+
+  title: {
+    textAlign: "right",
+    fontSize: 18,
+    fontWeight: "800",
+    marginVertical: 16,
+  },
+});

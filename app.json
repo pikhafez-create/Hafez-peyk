@@ -1,46 +1,31 @@
 {
   "expo": {
-    "name": "peyk-hafez",
+    "name": "پیک حافظ",
     "slug": "peyk-hafez",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
-    "scheme": "peykhafez",
-    "userInterfaceStyle": "automatic",
-    "ios": {
-      "icon": "./assets/expo.icon"
+    "icon": "./assets/images/logo.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/images/logo.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#F8FAFC"
     },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "android": {
+      "package": "com.peykhafez.app",
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "backgroundImage": "./assets/images/android-icon-background.png",
-        "monochromeImage": "./assets/images/android-icon-monochrome.png"
-      },
-      "predictiveBackGestureEnabled": false,
-      "package": "com.peykhafez.app"
-    },
-    "web": {
-      "output": "static",
-      "favicon": "./assets/images/favicon.png"
+        "foregroundImage": "./assets/images/logo.png",
+        "backgroundColor": "#F8FAFC"
+      }
     },
     "plugins": [
-      "expo-router",
-      [
-        "expo-splash-screen",
-        {
-          "backgroundColor": "#208AEF",
-          "android": {
-            "image": "./assets/images/splash-icon.png",
-            "imageWidth": 76
-          }
-        }
-      ],
-      "expo-image"
+      "expo-router"
     ],
     "experiments": {
-      "typedRoutes": true,
-      "reactCompiler": true
+      "typedRoutes": true
     },
     "extra": {
       "router": {},

@@ -1,72 +1,56 @@
-import { useEffect, useState } from "react";
-import { View, Text, ScrollView, Pressable } from "react-native";
-import {
-  getOrders,
-  updateStatus,
-  assignDriver,
-  getDrivers,
-  Order,
-  Driver
-} from "../../utils/storage";
-import { useAutoRefresh } from "../../hooks/useAutoRefresh";
+import React, { useState } from "react";
+import Page from "../../components/layout/Page";
+import StateView from "../../components/ui/StateView";
+import Card from "../../components/ui/Card";
+import Badge from "../../components/ui/Badge";
+import SegmentedControl from "../../components/ui/SegmentedControl";
+import SearchInput from "../../components/ui/SearchInput";
+import { View, Text } from "react-native";
 
 export default function Orders() {
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [drivers, setDrivers] = useState<Driver[]>([]);
+  const [loading] = useState(false);
+  const [filter, setFilter] = useState("all");
+  const [search, setSearch] = useState("");
 
-  const load = async () => {
-    const [o, d] = await Promise.all([getOrders(), getDrivers()]);
-    setOrders(o);
-    setDrivers(d);
-  };
+  const data = [
+    { id: 1, title: "سفارش 1", status: "success" },
+    { id: 2, title: "سفارش 2", status: "warning" },
+  ];
 
-  useEffect(() => {
-    load();
-  }, []);
-
-  useAutoRefresh(() => load(), 4000);
-
-  const refresh = async (fn: () => Promise<void>) => {
-    await fn();
-    await load();
-  };
+  const filtered = data
+    .filter((i) => (filter === "all" ? true : i.status === filter))
+    .filter((i) => i.title.includes(search));
 
   return (
-    <ScrollView style={{ flex: 1, padding: 20 }}>
-      <Text style={{ fontSize: 24, marginBottom: 20 }}>
-        پنل مدیریت سفارش‌ها
-      </Text>
+    <Page title="سفارش‌ها">
+      <View style={{ padding: 16, gap: 10 }}>
+        <SearchInput
+          value={search}
+          onChangeText={setSearch}
+          placeholder="جستجو"
+        />
 
-      {orders.map(order => (
-        <View key={order.id} style={{ borderWidth: 1, padding: 10, marginBottom: 10 }}>
-          <Text>مشتری: {order.customerName}</Text>
-          <Text>وضعیت: {order.status}</Text>
-          <Text>راننده: {order.driver || "تعیین نشده"}</Text>
+        <SegmentedControl
+          items={[
+            { label: "همه", value: "all" },
+            { label: "موفق", value: "success" },
+            { label: "در انتظار", value: "warning" },
+          ]}
+          value={filter}
+          onChange={setFilter}
+        />
 
-          <Text>انتخاب راننده:</Text>
-
-          {drivers.map(driver => (
-            <Pressable
-              key={driver.id}
-              onPress={() => refresh(() => assignDriver(order.id, driver.id))}
-            >
-              <Text>• {driver.name}</Text>
-            </Pressable>
-          ))}
-
-          <Pressable onPress={() =>
-            refresh(() => updateStatus(order.id, "delivering"))
-          }>
-            <Text>در حال ارسال</Text>
-          </Pressable>
-
-          <Pressable onPress={() =>
-            refresh(() => updateStatus(order.id, "done"))
-          }>
-            <Text>تحویل شد</Text>
-          </Pressable>
-        </View>
-      ))}
-    </ScrollView>
+        <StateView loading={loading} empty={filtered.length === 0}>
+          <View style={{ gap: 10 }}>
+            {filtered.map((item) => (
+              <Card key={item.id}>
+                <Text>{item.title}</Text>
+                <Badge label={item.status} variant={item.status as any} />
+              </Card>
+            ))}
+          </View>
+        </StateView>
+      </View>
+    </Page>
   );
 }

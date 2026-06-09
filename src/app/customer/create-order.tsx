@@ -1,37 +1,75 @@
-import { useState } from 'react';
-import { View, Text, TextInput, Pressable } from 'react-native';
-import { addOrder } from '../../utils/storage';
+import React, { useState } from "react";
+import Page from "../../components/layout/Page";
+import Card from "../../components/ui/Card";
+import Input from "../../components/ui/Input";
+import Button from "../../components/ui/Button";
+import Stepper from "../../components/ui/Stepper";
+import Toast from "../../components/ui/Toast";
+import LoaderOverlay from "../../components/ui/LoaderOverlay";
+import RadioGroup from "../../components/ui/RadioGroup";
+import Toggle from "../../components/ui/Toggle";
+import { View, Text } from "react-native";
 
 export default function CreateOrder() {
-  const [name, setName] = useState('');
-  const [pickup, setPickup] = useState('');
-  const [dropoff, setDropoff] = useState('');
+  const [step] = useState(0);
+  const [origin, setOrigin] = useState("");
+  const [destination, setDestination] = useState("");
+  const [type, setType] = useState("normal");
+  const [insurance, setInsurance] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [toast, setToast] = useState(false);
 
-  const createOrder = () => {
-    addOrder({
-      id: String(Date.now()),
-      customerName: name,
-      pickup,
-      dropoff,
-      status: 'pending',
-    });
-
-    setName('');
-    setPickup('');
-    setDropoff('');
+  const submit = () => {
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+      setToast(true);
+    }, 1200);
   };
 
   return (
-    <View style={{ flex: 1, padding: 20, justifyContent: 'center' }}>
-      <Text style={{ fontSize: 20, marginBottom: 10 }}>ثبت سفارش</Text>
+    <Page title="سفارش جدید">
+      {loading && <LoaderOverlay />}
 
-      <TextInput placeholder='نام مشتری' value={name} onChangeText={setName} />
-      <TextInput placeholder='مبدا' value={pickup} onChangeText={setPickup} />
-      <TextInput placeholder='مقصد' value={dropoff} onChangeText={setDropoff} />
+      <View style={{ padding: 16, gap: 12 }}>
+        <Stepper
+          steps={[
+            { label: "مبدا" },
+            { label: "مقصد" },
+            { label: "تأیید" },
+          ]}
+          current={step}
+        />
 
-      <Pressable onPress={createOrder}>
-        <Text>ثبت سفارش</Text>
-      </Pressable>
-    </View>
+        <Card>
+          <View style={{ gap: 10 }}>
+            <Input label="مبدا" value={origin} onChangeText={setOrigin} />
+            <Input label="مقصد" value={destination} onChangeText={setDestination} />
+
+            <RadioGroup
+              value={type}
+              onChange={setType}
+              items={[
+                { label: "عادی", value: "normal" },
+                { label: "فوری", value: "urgent" },
+              ]}
+            />
+
+            <View style={{ flexDirection: "row-reverse", justifyContent: "space-between", alignItems: "center" }}>
+              <Text>بیمه</Text>
+              <Toggle value={insurance} onChange={setInsurance} />
+            </View>
+          </View>
+        </Card>
+
+        <Button title="ثبت سفارش" onPress={submit} loading={loading} />
+
+        <Toast
+          visible={toast}
+          message="سفارش ثبت شد"
+          onHide={() => setToast(false)}
+        />
+      </View>
+    </Page>
   );
 }
